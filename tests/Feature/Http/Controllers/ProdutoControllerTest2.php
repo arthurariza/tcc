@@ -6,16 +6,16 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Produto;
+use App\User;
 
-class ProdutoControllerTest extends TestCase
+class ProdutoControllerTest2 extends TestCase
 {
     use RefreshDatabase;    
     
       public function testRedirectViewCorretaCadastro(){
-       
+        $usuario = $this->criarUsuario();
 
-        $response = $this->actingAs($usuario)
-            ->post(route('cadastrarProdutoR'), [
+        $response = $this->actingAs($usuario)->post(route('cadastrarProdutoR'), [
             'nome' => 'Produto 1',
             'valor' => 500
         ]);
@@ -31,7 +31,9 @@ class ProdutoControllerTest extends TestCase
 
     
     public function testProdutoCadastrado() {
-        $response = $this->post(route('cadastrarProdutoR'), [
+        $usuario = $this->criarUsuario();
+
+        $response = $this->actingAs($usuario)->post(route('cadastrarProdutoR'), [
             'nome' => 'Produto 2',
             'valor' => 500
         ]);
@@ -62,7 +64,9 @@ class ProdutoControllerTest extends TestCase
             'valor' => 500
         ]);
 
-        $response = $this->get(route('deletarProduto', $produto->id));
+        $usuario = $this->criarUsuario();       
+
+        $response = $this->actingAs($usuario)->get(route('deletarProduto', $produto->id));
 
         $this->assertDatabaseMissing('produtos', [
             'nome' => 'Produto 4',
@@ -80,6 +84,17 @@ class ProdutoControllerTest extends TestCase
             'nome' => 'Produto 5',
             'valor' => -1
         ]);
-    }    
+    }
+    
+    public function criarUsuario() {
+
+        $usuario = User::create([
+            'name' => 'Admin',
+             'email' => 'admin@admin.com', 
+             'password' => '123456'
+        ]);
+
+        return $usuario;
+    }
         
 }
